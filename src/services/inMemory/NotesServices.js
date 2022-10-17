@@ -1,7 +1,9 @@
 /*
     *1.FUNGSI service ini : untuk mengelola resource catatan 
 */ 
-const {nanoid} = require('nanoid')
+const {nanoid} = require('nanoid');
+const InvariantError = require('../../exceptions/InvariantError');
+const NotFoundError = require('../../exceptions/NotFoundError');
 class NotesService {
     constructor() {
         this._notes = [];
@@ -22,7 +24,8 @@ class NotesService {
         // mengecek newNote masuk ke this._notes dengan method filter()
         const isSuccess = this._notes.filter((note) => note.id === id).length > 0; //return boolean
         if(!isSuccess) {
-            throw new Error("Catatan gagal ditambahkan");
+            // throw new Error("Catatan gagal ditambahkan");
+            throw new InvariantError('Catatan gagal ditambahkan');
         }
 
         return id;
@@ -36,7 +39,8 @@ class NotesService {
         // mendapatkan note berdasarkan id, dengan method filter
         const note = this._notes.filter((note) => note.id === id)[0]; //return objek note
         if(!note) {
-            throw new Error('Catatan tidak ditemukan')
+            // throw new Error('Catatan tidak ditemukan')
+            throw new NotFoundError('Catatan tidak ditemukan');
         }
         return note;
     }
@@ -45,7 +49,8 @@ class NotesService {
         // mendapatkan index note, sesuai id yang dikirim client
         const index = this._notes.findIndex((note) => note.id === id);
         if (index === -1) {
-            throw new Error('Gagal memperbarui catatan. Id tidak ditemukan');
+            // throw new Error('Gagal memperbarui catatan. Id tidak ditemukan');
+            throw new NotFoundError('Gagal memperbarui catatan. Id tidak ditemukan');
         }
         const updatedAt = new Date().toISOString();
         this._notes[index] = {
@@ -59,7 +64,8 @@ class NotesService {
     deleteNoteById(id) {
         const index = this._notes.findIndex((note) => note.id === id);
         if (index === -1) {
-            throw new Error('Catatan gagal dihapus. Id tidak ditemukan');
+            // throw new Error('Catatan gagal dihapus. Id tidak ditemukan');
+            throw new NotFoundError('Catatan gagal dihapus. Id tidak ditemukan');
         }
         this._notes.splice(index, 1);
     }
