@@ -5,8 +5,9 @@
 
 class NotesHandler {
     // Parameter service nantinya akan diberikan nilai instance dari kelas NotesService
-    constructor(service) {
+    constructor(service, validator) {
         this._service = service;
+        this._validator = validator;
 
         this.postNoteHandler = this.postNoteHandler.bind(this);
         this.getNotesHandler = this.getNotesHandler.bind(this);
@@ -17,6 +18,7 @@ class NotesHandler {
 
     postNoteHandler(request, h) {
         try {
+            this._validator.validateNotePayload(request.payload);
             // mendapatkan request dari client
             const { title = 'untitled', body, tags } = request.payload;
             // memasukkan catatan
@@ -76,6 +78,7 @@ class NotesHandler {
 
     putNoteByIdHandler(request, h) {
         try {
+            this._validator.validateNotePayload(request.payload);
             // mendapatkan id yg dikirim client
             const { id } = request.params;
             // memanggil fungsi this._notes.editNoteById()

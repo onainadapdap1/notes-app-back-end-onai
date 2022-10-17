@@ -1,6 +1,8 @@
 const Hapi = require('@hapi/hapi');
 const notes = require('./api/notes'); //plugins
 const NotesService = require('./services/inMemory/NotesServices')
+const NotesValidator = require('./validator/notes/index')
+
 const init = async () => {
     // create instance NotesService
     const notesService = new NotesService();
@@ -19,6 +21,7 @@ const init = async () => {
         plugin: notes,
         options: {
             service: notesService,
+            validator: NotesValidator, //NotesValidator = objek yang berisi fungsi validateNotePayload
         },
     });
 
