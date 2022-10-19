@@ -1,5 +1,7 @@
 /*
     *FUNGSI : Mengelola resources dengan database postgreSql
+    *RETURNING merupakan kueri yang memungkinkan kita untuk mengambil 
+    *nilai kolom dari baris yang terdampak oleh operasi INSERT, UPDATE, ataupun DELETE.
 */
 // melakukan koneksi ke database
 const { nanoid } = require('nanoid');
@@ -47,5 +49,30 @@ class NotesService {
         }
         return result.rows.map(mapDBToModel)[0];
     }
-
+    // edit note by id
+    async editNoteById({title, body, tags}) {
+        const updatedAt = new Date().toISOString();
+        const query = {
+            text: 'UPDATE notes SET title = $1, body = $2, tags = $3, updated_at = $4 WHERE id = $5 RETURNING id',
+            values: [title, body, tags, updatedAt, id]
+        }
+        const result = await this._pool.query(query);
+        // jika result.rows = 0 / (false), return NotFoundError
+        if(!result.rows.length) {
+            throw new NotFoundError('Gagal memperbarui catatan. Id tidak ditemukan');
+        }
+    }
+    // delete note by id
+    async deleteNoteById(id) {
+        const query = {
+            text: 'DELETE FROM notes WHERE id = $1 RETURNING id',
+            values: [id]
+        };
+        const result = await this._pool.query(query);
+        if(!result.rows.length) {
+            throw new NotFoundError('Catatan gagal dihapus. Id tidak ditemukan');
+        }
+    }
 }
+
+module.exports = NotesService;
